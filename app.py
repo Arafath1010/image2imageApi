@@ -75,6 +75,11 @@ def generate_image(images, prompt, negative_prompt, face_strength, likeness_stre
     )
 
     print(image)
+    try:
+        print(type(image[0]))
+
+    except:
+        print("error")
     return image
 
 def swap_to_gallery(images):
@@ -104,7 +109,7 @@ with gr.Blocks(css=css) as demo:
             negative_prompt = gr.Textbox(label="Negative Prompt", info="What the model should NOT produce.",placeholder="low quality", value="(worst quality, low quality, illustration, 3d, 2d, painting, cartoons, sketch), open mouth")
             style = "Photorealistic"
             face_strength = gr.Slider(label="Prompt Strength", info="How much the written prompt weighs into the generated images.", value=7.5, step=0.1, minimum=0, maximum=15)
-            likeness_strength = gr.Slider(label="Photo Embedding Strength", info="How much your uploaded files weigh into the generated images.", value=1.0, step=0.1, minimum=0, maximum=5)
+            likeness_strength = gr.Slider(label="Photo Embedding Strength", info="How much your uploaded files weigh into the generated images.", value=0.4, step=0.1, minimum=0, maximum=1.5)
             submit = gr.Button("Submit", variant="primary")
         with gr.Column():
             gallery = gr.Gallery(label="Generated Images")
