@@ -12,6 +12,13 @@ import cv2
 #base_model_path = "playgroundai/playground-v2-1024px-aesthetic"
 base_model_path = "frankjoshua/juggernautXL_v8Rundiffusion"  
 
+try: from pip._internal.operations import freeze
+except ImportError: # pip < 10.0
+    from pip.operations import freeze
+
+pkgs = freeze.freeze()
+for pkg in pkgs: print(pkg)
+
 ip_ckpt = hf_hub_download(repo_id="h94/IP-Adapter-FaceID", filename="ip-adapter-faceid_sdxl.bin", repo_type="model")
 device = "cuda"
 
@@ -79,8 +86,8 @@ css = '''
 h1{margin-bottom: 0 !important}
 '''
 with gr.Blocks(css=css) as demo:
-    gr.Markdown("# IP-Adapter-FaceID SDXL demo")
-    gr.Markdown("A simple Demo for the [h94/IP-Adapter-FaceID SDXL model](https://huggingface.co/h94/IP-Adapter-FaceID) together with [Juggernaut XL v7](https://huggingface.co/stablediffusionapi/juggernaut-xl-v7). You should run this on at least 24 GB of VRAM.")
+    #gr.Markdown("# IP-Adapter-FaceID SDXL demo")
+    #gr.Markdown("A simple Demo for the [h94/IP-Adapter-FaceID SDXL model](https://huggingface.co/h94/IP-Adapter-FaceID) together with [Juggernaut XL v7](https://huggingface.co/stablediffusionapi/juggernaut-xl-v7). You should run this on at least 24 GB of VRAM.")
     with gr.Row():
         with gr.Column():
             files = gr.Files(
