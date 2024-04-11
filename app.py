@@ -76,11 +76,12 @@ def generate_image(images, prompt, negative_prompt, face_strength, likeness_stre
 
     print(image)
     try:
+        image[0].save('save_image.jpg')
         print(type(image[0]))
 
     except:
         print("error")
-    return image
+    return image.append("save_image.jpg")
 
 def swap_to_gallery(images):
     return gr.update(value=images, visible=True), gr.update(visible=True), gr.update(visible=False)
