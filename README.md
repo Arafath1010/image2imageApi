@@ -1,13 +1,9 @@
 ---
-title: H94 IP Adapter FaceID SDXL
+title: image2image_api
 emoji: 💗
 colorFrom: red
 colorTo: pink
-sdk: gradio
-sdk_version: 4.13.0
-app_file: app.py
-pinned: false
-suggested_hardware: a10g-large
+sdk: docker
 ---
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
