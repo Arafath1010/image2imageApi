@@ -104,5 +104,5 @@ async def get_image2image(prompt,file: UploadFile = File(...)):
     image[0].save('save_image.jpg')
     print(type(image[0]),"no error")
     
-    return FileResponse("save_image.jpg"),image
+    return FileResponse("save_image.jpg")
 
