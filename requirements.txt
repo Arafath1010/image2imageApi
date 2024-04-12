@@ -1,3 +1,6 @@
+fastapi
+requests
+uvicorn
 insightface==0.7.3
 diffusers==0.27.2
 transformers==4.39.3
