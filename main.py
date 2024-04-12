@@ -10,7 +10,7 @@ from diffusers import DDIMScheduler, StableDiffusionXLPipeline
 import ipown
 from huggingface_hub import hf_hub_download
 from insightface.app import FaceAnalysis
-import gradio as gr
+#import gradio as gr
 import cv2
 
 #base_model_path = "SG161222/RealVisXL_V3.0"
