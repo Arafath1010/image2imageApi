@@ -69,16 +69,19 @@ api.add_middleware(
 #@spaces.GPU(enable_queue=True)
 
 @api.post("/get_image2image")
-async def get_image2image(prompt,file: UploadFile = File(...),
-                          file1: Optional[UploadFile] = None,
-                          file2: Optional[UploadFile] = None,
-                          file3: Optional[UploadFile] = None,
-                          file4: Optional[UploadFile] = None,
-                          file5: Optional[UploadFile] = None,
-                          file6: Optional[UploadFile] = None,
-                          file7: Optional[UploadFile] = None,
+async def get_image2image(prompt,
+                          image1: UploadFile = File(...),
+                          image2: Optional[UploadFile] = File(None),
+                          image3: Optional[UploadFile] = File(None),
+                          image4: Optional[UploadFile] = File(None),
+                          image5: Optional[UploadFile] = File(None),
+                          image6: Optional[UploadFile] = File(None),
+                          image7: Optional[UploadFile] = File(None),
+                          image8: Optional[UploadFile] = File(None),
                          ):
     async with lock:
+        file = image1
+        
         print(file.filename)
         with open(file.filename, "wb") as file_object:
             file_object.write(file.file.read())
