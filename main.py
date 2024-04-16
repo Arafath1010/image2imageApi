@@ -71,13 +71,13 @@ api.add_middleware(
 @api.post("/get_image2image")
 async def get_image2image(prompt,
                           image1: UploadFile = File(...),
-                          image2: Optional[UploadFile] = File(None),
-                          image3: Optional[UploadFile] = File(None),
-                          image4: Optional[UploadFile] = File(None),
-                          image5: Optional[UploadFile] = File(None),
-                          image6: Optional[UploadFile] = File(None),
-                          image7: Optional[UploadFile] = File(None),
-                          image8: Optional[UploadFile] = File(None),
+                          image2: UploadFile = File(None),
+                          image3: UploadFile = File(None),
+                          image4: UploadFile = File(None),
+                          image5: UploadFile = File(None),
+                          image6: UploadFile = File(None),
+                          image7: UploadFile = File(None),
+                          image8: UploadFile = File(None),
                          ):
     async with lock:
         file = image1
