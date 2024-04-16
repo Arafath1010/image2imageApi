@@ -5,6 +5,7 @@ from fastapi.responses import StreamingResponse
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 import asyncio
+from typing import Optional
 
 import spaces
 from diffusers import DDIMScheduler, StableDiffusionXLPipeline
