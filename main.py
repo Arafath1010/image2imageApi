@@ -101,8 +101,26 @@ async def get_image2image(prompt,file: UploadFile = File(...)):
 
     print(image)
     
-    image[0].save('save_image.jpg')
-    print(type(image[0]),"no error")
+    image[0].save('img1.jpg')
+    image[1].save('img2.jpg')
+    image[2].save('img3.jpg')
+    image[3].save('img4.jpg')
+
     
-    return FileResponse("save_image.jpg")
+    import base64
+    
+    def convert_image_to_base64(filepath):
+        # Open the image file in binary mode
+        with open(filepath, 'rb') as image_file:
+            # Read the file and encode it into Base64
+            encoded_string = base64.b64encode(image_file.read())
+            return encoded_string.decode('utf-8')
+    
+    # Example usage:
+    img1 = convert_image_to_base64('img1.jpg')
+    img2 = convert_image_to_base64('img2.jpg')
+    img3 = convert_image_to_base64('img3.jpg')
+    img4 = convert_image_to_base64('img4.jpg')
+    
+    return {"image_1":img1,"image_2":img2,"image_3":img3,"image_4":img4}
 
