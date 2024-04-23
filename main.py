@@ -84,6 +84,13 @@ async def get_image2image(
                           image8: UploadFile = File(None),
                          ): 
     async with lock:
+        file = image1
+        
+        file_name = file.filename
+        print(file_name)
+        with open(file_name, "wb") as file_object:
+            file_object.write(file.file.read())
+            
         gender = gender.lower()
         output_image_count = math.ceil((output_image_count/4))
         total_image_list = []
@@ -93,11 +100,7 @@ async def get_image2image(
             if gender=="female":
                prompt = "make business woman photos"
             
-            file = image1
             
-            print(file.filename)
-            with open(file.filename, "wb") as file_object:
-                file_object.write(file.file.read())
                     
             negative_prompt = "(worst quality, low quality, illustration, 3d, 2d, painting, cartoons, sketch), open mouth"
             face_strength = 7.5
@@ -112,25 +115,29 @@ async def get_image2image(
             app.prepare(ctx_id=0, det_size=(512, 512))
             
             faceid_all_embeds = []
-        
-            face = cv2.imread(file.filename)
-            faces = app.get(face)
-            faceid_embed = torch.from_numpy(faces[0].normed_embedding).unsqueeze(0)
-            faceid_all_embeds.append(faceid_embed)
-        
-            average_embedding = torch.mean(torch.stack(faceid_all_embeds, dim=0), dim=0)
+            try:
+                face = cv2.imread(file_name)
+                faces = app.get(face)
+                faceid_embed = torch.from_numpy(faces[0].normed_embedding).unsqueeze(0)
+                faceid_all_embeds.append(faceid_embed)
             
-            total_negative_prompt = negative_prompt
+                average_embedding = torch.mean(torch.stack(faceid_all_embeds, dim=0), dim=0)
+                
+                total_negative_prompt = negative_prompt
+                
+                print("Generating SDXL")
+                image = ip_model.generate(
+                    prompt=prompt, negative_prompt=total_negative_prompt, faceid_embeds=average_embedding,
+                    scale=likeness_strength, width=image_width, height=image_height, guidance_scale=face_strength, num_inference_steps=30
+                )
             
-            print("Generating SDXL")
-            image = ip_model.generate(
-                prompt=prompt, negative_prompt=total_negative_prompt, faceid_embeds=average_embedding,
-                scale=likeness_strength, width=image_width, height=image_height, guidance_scale=face_strength, num_inference_steps=30
-            )
-        
-            print(image)
+                print(image)
+    
+                total_image_list.extend(image)
 
-            total_image_list.extend(image)
+            except Exception as e:
+                   print(e)
+                   return {"message":str(e)}
 
         print(total_image_list)
 
