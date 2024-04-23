@@ -65,11 +65,15 @@ api.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+import math
 #@spaces.GPU(enable_queue=True)
 
 @api.post("/get_image2image")
-async def get_image2image(prompt,
+async def get_image2image(
+                          gender: str,
+                          image_height: int,
+                          image_width: int,
+                          output_image_count: int,
                           image1: UploadFile = File(...),
                           image2: UploadFile = File(None),
                           image3: UploadFile = File(None),
@@ -78,65 +82,86 @@ async def get_image2image(prompt,
                           image6: UploadFile = File(None),
                           image7: UploadFile = File(None),
                           image8: UploadFile = File(None),
-                         ):
+                         ): 
     async with lock:
-        file = image1
+        gender = gender.lower()
+        output_image_count = math.ceil((output_image_count/4))
+        total_image_list = []
+        for no in range(output_image_count):
+            if gender=="male":
+               prompt = "make business man photos"
+            if gender=="female":
+               prompt = "make business woman photos"
+            
+            file = image1
+            
+            print(file.filename)
+            with open(file.filename, "wb") as file_object:
+                file_object.write(file.file.read())
+                    
+            negative_prompt = "(worst quality, low quality, illustration, 3d, 2d, painting, cartoons, sketch), open mouth"
+            face_strength = 7.5
+            likeness_strength = 0.7
+            
+            # Clear GPU memory
+            torch.cuda.empty_cache()
+            
+            # Start the process
+            pipe.to(device)
+            app = FaceAnalysis(name="buffalo_l", providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
+            app.prepare(ctx_id=0, det_size=(512, 512))
+            
+            faceid_all_embeds = []
         
-        print(file.filename)
-        with open(file.filename, "wb") as file_object:
-            file_object.write(file.file.read())
-                
-        negative_prompt = "(worst quality, low quality, illustration, 3d, 2d, painting, cartoons, sketch), open mouth"
-        face_strength = 7.5
-        likeness_strength = 0.4
+            face = cv2.imread(file.filename)
+            faces = app.get(face)
+            faceid_embed = torch.from_numpy(faces[0].normed_embedding).unsqueeze(0)
+            faceid_all_embeds.append(faceid_embed)
         
-        # Clear GPU memory
-        torch.cuda.empty_cache()
+            average_embedding = torch.mean(torch.stack(faceid_all_embeds, dim=0), dim=0)
+            
+            total_negative_prompt = negative_prompt
+            
+            print("Generating SDXL")
+            image = ip_model.generate(
+                prompt=prompt, negative_prompt=total_negative_prompt, faceid_embeds=average_embedding,
+                scale=likeness_strength, width=image_width, height=image_height, guidance_scale=face_strength, num_inference_steps=30
+            )
         
-        # Start the process
-        pipe.to(device)
-        app = FaceAnalysis(name="buffalo_l", providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
-        app.prepare(ctx_id=0, det_size=(512, 512))
-        
-        faceid_all_embeds = []
-    
-        face = cv2.imread(file.filename)
-        faces = app.get(face)
-        faceid_embed = torch.from_numpy(faces[0].normed_embedding).unsqueeze(0)
-        faceid_all_embeds.append(faceid_embed)
-    
-        average_embedding = torch.mean(torch.stack(faceid_all_embeds, dim=0), dim=0)
-        
-        total_negative_prompt = negative_prompt
-        
-        print("Generating SDXL")
-        image = ip_model.generate(
-            prompt=prompt, negative_prompt=total_negative_prompt, faceid_embeds=average_embedding,
-            scale=likeness_strength, width=864, height=1152, guidance_scale=face_strength, num_inference_steps=30
-        )
-    
-        print(image)
-        
-        image[0].save('img1.jpg')
-        image[1].save('img2.jpg')
-        image[2].save('img3.jpg')
-        image[3].save('img4.jpg')
-    
-        
+            print(image)
+
+            total_image_list.extend(image)
+
+        print(total_image_list)
+
         import base64
-        
+            
         def convert_image_to_base64(filepath):
-            # Open the image file in binary mode
+                # Open the image file in binary mode
             with open(filepath, 'rb') as image_file:
                 # Read the file and encode it into Base64
                 encoded_string = base64.b64encode(image_file.read())
                 return encoded_string.decode('utf-8')
         
-        # Example usage:
-        img1 = convert_image_to_base64('img1.jpg')
-        img2 = convert_image_to_base64('img2.jpg')
-        img3 = convert_image_to_base64('img3.jpg')
-        img4 = convert_image_to_base64('img4.jpg')
+        number_for_images = 1
+        base64_list = []
+        for gen_images in total_image_list:
+            gen_images.save('img'+str(number_for_images)+'.jpg')
+            base64_list.append(convert_image_to_base64('img'+str(number_for_images)+'.jpg'))
+            number_for_images = number_for_images + 1
+            #image[1].save('img2.jpg')
+            #image[2].save('img3.jpg')
+            #image[3].save('img4.jpg')
         
-        return {"image_1":img1,"image_2":img2,"image_3":img3,"image_4":img4}
+            # Example usage:
+            #img1 = convert_image_to_base64('img'+str(number_for_images)+'.jpg')
+            #img2 = convert_image_to_base64('img2.jpg')
+            #img3 = convert_image_to_base64('img3.jpg')
+            #img4 = convert_image_to_base64('img4.jpg')
+            
+        return {"images":base64_list}
+        
+
+    
+
 
