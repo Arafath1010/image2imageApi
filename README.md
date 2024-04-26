@@ -13,3 +13,5 @@ https://medium.com/@shreyash966977/deploy-fastapi-on-aws-ec2-quick-and-easy-step
 https://chat.openai.com/share/574cb6d9-46bd-4b30-872d-2e4c0c079b8c
 
 https://dev.to/bashirk/how-to-add-a-static-ip-to-an-aws-ec2-instance-2hea
+
+https://chat.openai.com/share/1c043ecf-efed-4601-a94f-bb9614b1dac4
